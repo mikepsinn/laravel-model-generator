@@ -35,7 +35,7 @@ class Classify
     {
         $value = Dumper::export($value);
 
-        return "\tconst $name = $value;\n";
+        return "\tpublic const FIELD_$name = $value;\n";
     }
 
     /**
