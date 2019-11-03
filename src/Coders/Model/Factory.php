@@ -9,6 +9,7 @@ namespace Reliese\Coders\Model;
 
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Reliese\Meta\Blueprint;
 use Reliese\Meta\SchemaManager;
@@ -117,7 +118,7 @@ class Factory
                 try {
                     $this->create($mapper->schema(), $blueprint->table());
                 } catch (\Throwable $e) {
-                    $this->info("\n WARNING: Could not create model for ".$blueprint->table().' because '.$e->getMessage()."\n");
+                    print "\n WARNING: Could not create model for ".$blueprint->table().' because '.$e->getMessage()."\n";
                 }
             }
         }
@@ -254,8 +255,12 @@ class Factory
      */
     protected function fillTemplate($template, Model $model)
     {
+        $className = $model->getClassName();
+        if($model->usesBaseFiles()){
+            $className = $this->getBaseClassName($model);
+        }
         $template = str_replace('{{namespace}}', $model->getBaseNamespace(), $template);
-        $template = str_replace('{{class}}', $model->getClassName(), $template);
+        $template = str_replace('{{class}}', $className, $template);
 
         $properties = $this->properties($model);
         $usedClasses = $this->extractUsedClasses($properties);
@@ -485,8 +490,11 @@ class Factory
         if (! $this->files->isDirectory($modelsDirectory)) {
             $this->files->makeDirectory($modelsDirectory, 0755, true);
         }
-
-        return $this->path([$modelsDirectory, $model->getClassName().'.php']);
+        $className = $model->getClassName();
+        if($custom ===  ['Base']){
+            $className = $this->getBaseClassName($model);
+        }
+        return $this->path([$modelsDirectory, $className.'.php']);
     }
 
     /**
@@ -506,7 +514,31 @@ class Factory
      */
     public function needsUserFile(Model $model)
     {
-        return ! $this->files->exists($this->modelPath($model)) && $model->usesBaseFiles();
+        if(!$model->usesBaseFiles()){
+            return false;
+        }
+        $pathToChildModel = $this->modelPath($model);
+        $exists = $this->files->exists($pathToChildModel);
+        if($exists){
+            fwrite(STDERR,  "fwrite $pathToChildModel already exists so not generating child for base model");
+            print "print $pathToChildModel already exists so not generating child for base model";
+            Log::info(" info log $pathToChildModel already exists so not generating child for base model");
+            $str = file_get_contents($pathToChildModel);
+            $parentClassFull = $model->getParentClass();
+            $parentClassShort = substr($parentClassFull, strrpos($parentClassFull, '\\') + 1);
+            $modelBaseClassShort = $this->getBaseClassName($model);
+            $namespace = $model->getNamespace();
+            $modelBaseClassFull = $namespace.'\\Base\\'.$modelBaseClassShort;
+            $str = str_replace(" extends $parentClassShort", " extends $modelBaseClassShort", $str);
+            $str = str_replace("use $parentClassFull", "use $modelBaseClassFull", $str);
+            $useStatment = "use $modelBaseClassFull;";
+            if(strpos($str, $useStatment) === false){
+                $str = str_replace("namespace $namespace;", "namespace $namespace;\n$useStatment", $str);
+            }
+            file_put_contents($pathToChildModel, $str); //write the entire string
+            return false;
+        }
+        return true;
     }
 
     /**
