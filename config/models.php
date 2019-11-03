@@ -387,6 +387,16 @@ return [
         'override_pluralize_for' => [
 
         ],
+        /*
+        |--------------------------------------------------------------------------
+        | Constant Name Prefix
+        |--------------------------------------------------------------------------
+        |
+        | Only applicable when setting with_property_constants => true
+        |
+        */
+
+        'constant_name_prefix' => 'FIELD_',
     ],
 
     /*

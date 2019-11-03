@@ -101,20 +101,22 @@ class BelongsToMany implements Relation
 
         $body .= $this->reference->getQualifiedUserClassName().'::class';
 
+        $constantNamePrefix = $this->parent->constantNamePrefix();
+
         if ($this->needsPivotTable()) {
             $body .= ', '.Dumper::export($this->pivotTable());
         }
 
         if ($this->needsForeignKey()) {
             $foreignKey = $this->parent->usesPropertyConstants()
-                ? $this->reference->getQualifiedUserClassName().'::'.strtoupper($this->foreignKey())
+                ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
                 : $this->foreignKey();
             $body .= ', '.Dumper::export($foreignKey);
         }
 
         if ($this->needsOtherKey()) {
             $otherKey = $this->reference->usesPropertyConstants()
-                ? $this->reference->getQualifiedUserClassName().'::'.strtoupper($this->otherKey())
+                ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->otherKey())
                 : $this->otherKey();
             $body .= ', '.Dumper::export($otherKey);
         }
@@ -231,9 +233,11 @@ class BelongsToMany implements Relation
      */
     private function parametrize($fields = [])
     {
+
         return (string) implode(', ', array_map(function ($field) {
+            $constantNamePrefix = $this->parent->constantNamePrefix();
             $field = $this->reference->usesPropertyConstants()
-                ? $this->pivot->getQualifiedUserClassName().'::'.strtoupper($field)
+                ? $this->pivot->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($field)
                 : $field;
 
             return Dumper::export($field);

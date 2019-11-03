@@ -29,13 +29,13 @@ class Classify
      * @param string $name
      * @param mixed $value
      *
+     * @param $prefix
      * @return string
      */
-    public function constant($name, $value)
+    public function constant($name, $value, $prefix)
     {
         $value = Dumper::export($value);
-
-        return "\tpublic const FIELD_$name = $value;\n";
+        return "\tpublic const $prefix$name = $value;\n";
     }
 
     /**

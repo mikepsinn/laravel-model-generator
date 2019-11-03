@@ -75,16 +75,18 @@ class BelongsTo implements Relation
 
         $body .= $this->related->getQualifiedUserClassName().'::class';
 
+        $constantNamePrefix = $this->parent->constantNamePrefix();
+
         if ($this->needsForeignKey()) {
             $foreignKey = $this->parent->usesPropertyConstants()
-                ? $this->parent->getQualifiedUserClassName().'::'.strtoupper($this->foreignKey())
+                ? $this->parent->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
                 : $this->foreignKey();
             $body .= ', '.Dumper::export($foreignKey);
         }
 
         if ($this->needsOtherKey()) {
             $otherKey = $this->related->usesPropertyConstants()
-                ? $this->related->getQualifiedUserClassName().'::'.strtoupper($this->otherKey())
+                ? $this->related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->otherKey())
                 : $this->otherKey();
             $body .= ', '.Dumper::export($otherKey);
         }

@@ -379,17 +379,17 @@ class Factory
         $excludedConstants = [];
 
         if ($model->hasCustomCreatedAtField()) {
-            $body .= $this->class->constant('CREATED_AT', $model->getCreatedAtField());
+            $body .= $this->class->constant('CREATED_AT', $model->getCreatedAtField(), $model->constantNamePrefix());
             $excludedConstants[] = $model->getCreatedAtField();
         }
 
         if ($model->hasCustomUpdatedAtField()) {
-            $body .= $this->class->constant('UPDATED_AT', $model->getUpdatedAtField());
+            $body .= $this->class->constant('UPDATED_AT', $model->getUpdatedAtField(), $model->constantNamePrefix());
             $excludedConstants[] = $model->getUpdatedAtField();
         }
 
         if ($model->hasCustomDeletedAtField()) {
-            $body .= $this->class->constant('DELETED_AT', $model->getDeletedAtField());
+            $body .= $this->class->constant('DELETED_AT', $model->getDeletedAtField(), $model->constantNamePrefix());
             $excludedConstants[] = $model->getDeletedAtField();
         }
 
@@ -399,7 +399,7 @@ class Factory
             $properties = array_diff($properties, $excludedConstants);
 
             foreach ($properties as $property) {
-                $body .= $this->class->constant(strtoupper($property), $property);
+                $body .= $this->class->constant(strtoupper($property), $property, $model->constantNamePrefix());
             }
         }
 

@@ -53,6 +53,8 @@ abstract class HasOneOrMany implements Relation
      */
     abstract public function name();
 
+
+
     /**
      * @return string
      */
@@ -62,16 +64,18 @@ abstract class HasOneOrMany implements Relation
 
         $body .= $this->related->getQualifiedUserClassName().'::class';
 
+        $constantNamePrefix = $this->parent->constantNamePrefix();
+
         if ($this->needsForeignKey()) {
             $foreignKey = $this->parent->usesPropertyConstants()
-                ? $this->related->getQualifiedUserClassName().'::'.strtoupper($this->foreignKey())
+                ? $this->related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
                 : $this->foreignKey();
             $body .= ', '.Dumper::export($foreignKey);
         }
 
         if ($this->needsLocalKey()) {
             $localKey = $this->related->usesPropertyConstants()
-                ? $this->related->getQualifiedUserClassName().'::'.strtoupper($this->localKey())
+                ? $this->related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->localKey())
                 : $this->localKey();
             $body .= ', '.Dumper::export($localKey);
         }

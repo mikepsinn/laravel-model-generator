@@ -252,7 +252,8 @@ class Model
         // TODO: Check type cast is OK
         $cast = $column->type;
 
-        $propertyName = $this->usesPropertyConstants() ? 'self::FIELD_'.strtoupper($column->name) : $column->name;
+        $prefix = $this->constantNamePrefix();
+        $propertyName = $this->usesPropertyConstants() ? 'self::'.$prefix.strtoupper($column->name) : $column->name;
 
         // Due to some casting problems when converting null to a Carbon instance,
         // we are going to treat Soft Deletes field as string.
@@ -1186,6 +1187,14 @@ class Model
     public function usesPropertyConstants()
     {
         return $this->config('with_property_constants', false);
+    }
+
+    /**
+     * @return bool
+     */
+    public function constantNamePrefix()
+    {
+        return $this->config('constant_name_prefix', '');
     }
 
     /**
