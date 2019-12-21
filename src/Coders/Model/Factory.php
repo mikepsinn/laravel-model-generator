@@ -567,7 +567,8 @@ class Factory
      */
     private function formatBaseClasses(Model $model)
     {
-        return "use {$model->getBaseNamespace()}\\{$model->getClassName()} as {$this->getBaseClassName($model)};";
+        //return "use {$model->getBaseNamespace()}\\{$model->getClassName()} as {$this->getBaseClassName($model)};";
+        return "use {$model->getBaseNamespace()}\\{$model->getClassName()}";
     }
 
     /**
