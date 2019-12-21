@@ -3,6 +3,7 @@
 /** @noinspection PhpMissingDocCommentInspection */ 
 /** @noinspection PhpUnused */
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
+/** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
 
 /**
  * Created by Reliese Model.
