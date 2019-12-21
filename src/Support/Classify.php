@@ -32,7 +32,7 @@ class Classify
      * @param $prefix
      * @return string
      */
-    public function constant($name, $value, $prefix)
+    public function constant($name, $value, $prefix = null)
     {
         $value = Dumper::export($value);
         return "\tpublic const $prefix$name = $value;\n";
