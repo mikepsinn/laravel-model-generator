@@ -7,6 +7,7 @@
 
 namespace Reliese\Coders\Model;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Reliese\Meta\Blueprint;
 use Illuminate\Support\Fluent;
@@ -56,6 +57,11 @@ class Model
      * @var array
      */
     protected $casts = [];
+
+    /**
+     * @var array
+     */
+    protected $rules = [];
 
     /**
      * @var \Reliese\Coders\Model\Mutator[]
@@ -224,6 +230,10 @@ class Model
         foreach ($this->blueprint->columns() as $column) {
             $this->parseColumn($column);
         }
+
+        DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+        $rules = \Jijoel\ValidationRuleGenerator\Generator::make()->getTableRules($this->getTable());
+        $this->rules = $rules;
 
         if (! $this->loadRelations) {
             return;
@@ -952,6 +962,29 @@ class Model
      * @return array
      */
     public function getCasts()
+    {
+        if (
+            array_key_exists($this->getPrimaryKey(), $this->casts) &&
+            $this->autoincrement()
+        ) {
+            unset($this->casts[$this->getPrimaryKey()]);
+        }
+
+        return $this->casts;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRules()
+    {
+        return ! empty($this->getCasts());
+    }
+
+    /**
+     * @return array
+     */
+    public function getRules()
     {
         if (
             array_key_exists($this->getPrimaryKey(), $this->casts) &&

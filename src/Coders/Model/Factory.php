@@ -448,6 +448,10 @@ class Factory
             $body .= $this->class->field('casts', $model->getCasts(), ['before' => "\n"]);
         }
 
+        if ($model->hasRules()) {
+            $body .= $this->class->field('rules', $model->getRules(), ['before' => "\n"]);
+        }
+
         if ($model->hasDates()) {
             $body .= $this->class->field('dates', $model->getDates(), ['before' => "\n"]);
         }
