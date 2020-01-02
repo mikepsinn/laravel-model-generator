@@ -7,7 +7,6 @@
 
 namespace Reliese\Coders\Model;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Reliese\Meta\Blueprint;
 use Illuminate\Support\Fluent;
@@ -231,8 +230,9 @@ class Model
             $this->parseColumn($column);
         }
 
-        DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-        $rules = \Jijoel\ValidationRuleGenerator\Generator::make()->getTableRules($this->getTable());
+        \Illuminate\Support\Facades\DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()
+            ->registerDoctrineTypeMapping('enum', 'string');
+        $rules = \Reliese\Coders\Model\Rules\Generator::make()->getTableRules($this->getTable());
         $this->rules = $rules;
 
         if (! $this->loadRelations) {
@@ -978,7 +978,7 @@ class Model
      */
     public function hasRules()
     {
-        return ! empty($this->getCasts());
+        return ! empty($this->getRules());
     }
 
     /**
@@ -986,14 +986,7 @@ class Model
      */
     public function getRules()
     {
-        if (
-            array_key_exists($this->getPrimaryKey(), $this->casts) &&
-            $this->autoincrement()
-        ) {
-            unset($this->casts[$this->getPrimaryKey()]);
-        }
-
-        return $this->casts;
+        return $this->rules;
     }
 
     /**
