@@ -21,8 +21,7 @@
         "illuminate/database": "~5.1",
         "illuminate/contracts": "~5.1",
         "illuminate/filesystem": "~5.1",
-        "illuminate/console": "~5.1",
-        "kalani/validation-rule-generator": "dev-master"
+        "illuminate/console": "~5.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
