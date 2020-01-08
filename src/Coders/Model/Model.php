@@ -233,7 +233,14 @@ class Model
         \Illuminate\Support\Facades\DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()
             ->registerDoctrineTypeMapping('enum', 'string');
         $rules = \Reliese\Coders\Model\Rules\Generator::make()->getTableRules($this->getTable());
-        $this->rules = $rules;
+        foreach($rules as $propertyName => $ruleString){
+            if($this->usesPropertyConstants()){
+                $prefix = $this->constantNamePrefix();
+                $propertyName = 'self::'.$prefix.strtoupper($propertyName);
+            }
+            $this->rules[$propertyName] = $ruleString;
+        }
+
 
         if (! $this->loadRelations) {
             return;
@@ -557,8 +564,8 @@ class Model
     public function usesTimestamps()
     {
         return $this->timestamps &&
-               $this->blueprint->hasColumn($this->getCreatedAtField()) &&
-               $this->blueprint->hasColumn($this->getUpdatedAtField());
+            $this->blueprint->hasColumn($this->getCreatedAtField()) &&
+            $this->blueprint->hasColumn($this->getUpdatedAtField());
     }
 
     /**
@@ -587,7 +594,7 @@ class Model
     public function hasCustomCreatedAtField()
     {
         return $this->usesTimestamps() &&
-               $this->getCreatedAtField() != $this->getDefaultCreatedAtField();
+            $this->getCreatedAtField() != $this->getDefaultCreatedAtField();
     }
 
     /**
@@ -624,7 +631,7 @@ class Model
     public function hasCustomUpdatedAtField()
     {
         return $this->usesTimestamps() &&
-               $this->getUpdatedAtField() != $this->getDefaultUpdatedAtField();
+            $this->getUpdatedAtField() != $this->getDefaultUpdatedAtField();
     }
 
     /**
@@ -653,7 +660,7 @@ class Model
     public function usesSoftDeletes()
     {
         return $this->softDeletes &&
-               $this->blueprint->hasColumn($this->getDeletedAtField());
+            $this->blueprint->hasColumn($this->getDeletedAtField());
     }
 
     /**
@@ -682,7 +689,7 @@ class Model
     public function hasCustomDeletedAtField()
     {
         return $this->usesSoftDeletes() &&
-               $this->getDeletedAtField() != $this->getDefaultDeletedAtField();
+            $this->getDeletedAtField() != $this->getDefaultDeletedAtField();
     }
 
     /**
@@ -796,7 +803,7 @@ class Model
     public function hasCustomPrimaryKey()
     {
         return count($this->primaryKeys->columns) == 1 &&
-               $this->getPrimaryKey() != $this->getDefaultPrimaryKeyField();
+            $this->getPrimaryKey() != $this->getDefaultPrimaryKeyField();
     }
 
     /**
