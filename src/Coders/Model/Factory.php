@@ -397,7 +397,7 @@ class Factory
             // Take all properties and exclude already added constants with timestamps.
             $properties = array_keys($model->getProperties());
             $properties = array_diff($properties, $excludedConstants);
-
+            asort($properties);
             foreach ($properties as $property) {
                 $body .= $this->class->constant(strtoupper($property), $property, $model->constantNamePrefix());
             }
