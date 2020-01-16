@@ -31,17 +31,31 @@ class BelongsTo implements Relation
     protected $related;
 
     /**
+     * @var \Reliese\Coders\Model\Model
+     */
+    protected $relationNameStrategy;
+
+    /**
      * BelongsToWriter constructor.
      *
      * @param \Illuminate\Support\Fluent $command
      * @param \Reliese\Coders\Model\Model $parent
      * @param \Reliese\Coders\Model\Model $related
      */
-    public function __construct(Fluent $command, Model $parent, Model $related)
+    public function __construct(Fluent $command, Model $parent, Model $related, string $relationNameStrategy)
     {
         $this->command = $command;
         $this->parent = $parent;
         $this->related = $related;
+        $this->relationNameStrategy = $relationNameStrategy;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelationNameStrategy()
+    {
+        return $this->relationNameStrategy;
     }
 
     /**
@@ -49,12 +63,11 @@ class BelongsTo implements Relation
      */
     public function name()
     {
-        switch ($this->parent->getRelationNameStrategy()) {
+        $strategy = $this->getRelationNameStrategy();
+
+        switch ($strategy) {
             case 'foreign_key':
-                $relationName = preg_replace("/[^a-zA-Z0-9]?{$this->otherKey()}$/", '', $this->foreignKey());
-                if(empty($relationName)){
-                    $relationName = $this->related->getClassName();
-                }
+                $relationName = $this->getForeignKeyBasedRelationName();
                 break;
             default:
             case 'related':
@@ -194,5 +207,17 @@ class BelongsTo implements Relation
     protected function hasCompositeOtherKey()
     {
         return count($this->command->references) > 1;
+    }
+    /**
+     * @return string|string[]|null
+     */
+    public function getForeignKeyBasedRelationName(){
+        $relationName = preg_replace("/[^a-zA-Z0-9]?{$this->otherKey()}$/", '', $this->foreignKey());
+        if(empty($relationName)){
+            $relationName = $this->related->getClassName();
+        }
+        $relationName = rtrim($relationName, '_');
+        $relationName = str_replace('_id', '', $relationName);
+        return $relationName;
     }
 }

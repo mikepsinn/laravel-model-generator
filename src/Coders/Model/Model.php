@@ -246,9 +246,19 @@ class Model
             return;
         }
 
+        $tableRelationNameStrategies = [];
         foreach ($this->blueprint->relations() as $relation) {
+            $table = $relation->on['table'];
+            if(!isset($tableRelationNameStrategies[$table])){
+                $tableRelationNameStrategies[$table] = $this->getRelationNameStrategy();
+            }else{
+                $tableRelationNameStrategies[$table] = 'foreign_key';
+            }
+        }
+        foreach ($this->blueprint->relations() as $relation) {
+            $table = $relation->on['table'];
             $model = $this->makeRelationModel($relation);
-            $belongsTo = new BelongsTo($relation, $this, $model);
+            $belongsTo = new BelongsTo($relation, $this, $model, $tableRelationNameStrategies[$table]);
             $this->relations[$belongsTo->name()] = $belongsTo;
         }
 
