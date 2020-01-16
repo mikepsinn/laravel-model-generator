@@ -52,11 +52,18 @@ class BelongsTo implements Relation
         switch ($this->parent->getRelationNameStrategy()) {
             case 'foreign_key':
                 $relationName = preg_replace("/[^a-zA-Z0-9]?{$this->otherKey()}$/", '', $this->foreignKey());
+                if(empty($relationName)){
+                    $relationName = $this->related->getClassName();
+                }
                 break;
             default:
             case 'related':
                 $relationName = $this->related->getClassName();
                 break;
+        }
+
+        if(empty($relationName)){
+            throw new \LogicException("Could not determine relation name!");
         }
 
         if ($this->parent->usesSnakeAttributes()) {
