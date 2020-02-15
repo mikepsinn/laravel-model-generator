@@ -91,25 +91,33 @@ class BelongsTo implements Relation
      */
     public function body()
     {
+        $related = $this->related;
+
+        $parent = $this->parent;
+
         $body = 'return $this->belongsTo(';
 
-        $body .= $this->related->getQualifiedUserClassName().'::class';
+        $body .= $related->getQualifiedUserClassName().'::class';
 
-        $constantNamePrefix = $this->parent->constantNamePrefix();
+        $constantNamePrefix = $parent->constantNamePrefix();
 
-        if ($this->needsForeignKey()) {
-            $foreignKey = $this->parent->usesPropertyConstants()
-                ? $this->parent->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
-                : $this->foreignKey();
-            $body .= ', '.Dumper::export($foreignKey);
-        }
+        $foreignKeyColumnName = $this->foreignKey();
+        $foreignKey = $parent->usesPropertyConstants()
+            ? $parent->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($foreignKeyColumnName)
+            : $foreignKeyColumnName;
+        $body .= ', '.Dumper::export($foreignKey);
 
-        if ($this->needsOtherKey()) {
-            $otherKey = $this->related->usesPropertyConstants()
-                ? $this->related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->otherKey())
-                : $this->otherKey();
-            $body .= ', '.Dumper::export($otherKey);
-        }
+        $otherKeyColumnName = $this->otherKey();
+        $otherKey = $related->usesPropertyConstants()
+            ? $related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($otherKeyColumnName)
+            : $otherKeyColumnName;
+        $body .= ', '.Dumper::export($otherKey);
+
+        $ownerKeyColumnName = $this->ownerKey();
+        $ownerKey = $parent->usesPropertyConstants()
+            ? $parent->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($ownerKeyColumnName)
+            : $foreignKeyColumnName;
+        $body .= ', '.Dumper::export($ownerKey);
 
         $body .= ')';
 
@@ -146,7 +154,11 @@ class BelongsTo implements Relation
     {
         $defaultForeignKey = $this->related->getRecordName().'_id';
 
-        return $defaultForeignKey != $this->foreignKey() || $this->needsOtherKey();
+        $foreignKey = $this->foreignKey();
+
+        $needsOtherKey = $this->needsOtherKey();
+
+        return $defaultForeignKey != $foreignKey || $needsOtherKey;
     }
 
     /**
@@ -175,8 +187,8 @@ class BelongsTo implements Relation
     protected function needsOtherKey()
     {
         $defaultOtherKey = $this->related->getPrimaryKey();
-
-        return $defaultOtherKey != $this->otherKey();
+        $otherKey = $this->otherKey();
+        return $defaultOtherKey != $otherKey;
     }
 
     /**
@@ -186,7 +198,18 @@ class BelongsTo implements Relation
      */
     protected function otherKey($index = 0)
     {
-        return $this->command->references[$index];
+        $references = $this->command->references;
+        return $references[$index];
+    }
+
+    /**
+     * @param int $index
+     *
+     * @return string
+     */
+    protected function ownerKey($index = 0)
+    {
+        return $this->foreignKey($index);
     }
 
     /**
