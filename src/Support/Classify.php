@@ -67,8 +67,17 @@ class Classify
     public function method($name, $body, $options = [])
     {
         $visibility = Arr::get($options, 'visibility', 'public');
-
-        return "\n\t$visibility function $name()\n\t{\n\t\t$body\n\t}\n";
+        $nameAndReturnType = "$name()";
+        if(stripos($body, 'belongsTo') !== false){
+            $nameAndReturnType .= ": "."BelongsTo";
+        }
+        if(stripos($body, 'hasOne') !== false){
+            $nameAndReturnType .= ": "."HasOne";
+        }
+        if(stripos($body, 'hasMany') !== false){
+            $nameAndReturnType .= ": "."HasMany";
+        }
+        return "\n\t$visibility function $nameAndReturnType\n\t{\n\t\t$body\n\t}\n";
     }
 
     public function mixin($class)
