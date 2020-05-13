@@ -69,13 +69,13 @@ class Classify
         $visibility = Arr::get($options, 'visibility', 'public');
         $nameAndReturnType = "$name()";
         if(stripos($body, 'belongsTo') !== false){
-            $nameAndReturnType .= ": "."BelongsTo";
+            $nameAndReturnType .= ": "."\Illuminate\Database\Eloquent\Relations\BelongsTo";
         }
         if(stripos($body, 'hasOne') !== false){
-            $nameAndReturnType .= ": "."HasOne";
+            $nameAndReturnType .= ": "."\Illuminate\Database\Eloquent\Relations\HasOne";
         }
         if(stripos($body, 'hasMany') !== false){
-            $nameAndReturnType .= ": "."HasMany";
+            $nameAndReturnType .= ": "."\Illuminate\Database\Eloquent\Relations\HasMany";
         }
         return "\n\t$visibility function $nameAndReturnType\n\t{\n\t\t$body\n\t}\n";
     }

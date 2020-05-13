@@ -255,14 +255,34 @@ class Model
                 $tableRelationNameStrategies[$table] = 'foreign_key';
             }
         }
-        foreach ($this->blueprint->relations() as $relation) {
+        $relations = $this->blueprint->relations();
+        $except = $this->config('except', []);
+        foreach ($relations as $relation) {
             $table = $relation->on['table'];
-            $model = $this->makeRelationModel($relation);
-            $belongsTo = new BelongsTo($relation, $this, $model, $tableRelationNameStrategies[$table]);
-            $this->relations[$belongsTo->name()] = $belongsTo;
+            $skip = false;
+            foreach ($except as $pattern) {
+                if (Str::is($pattern, $table)) {
+                    $skip = true;
+                }
+            }
+            if(!$skip){
+                $model = $this->makeRelationModel($relation);
+                $belongsTo = new BelongsTo($relation, $this, $model, $tableRelationNameStrategies[$table]);
+                $this->relations[$belongsTo->name()] = $belongsTo;
+            }
         }
 
         foreach ($this->factory->referencing($this) as $related) {
+            /** @var \Reliese\Meta\Blueprint $schema */
+            $bp = $related["blueprint"];
+            $table = $bp->table();
+            $skip = false;
+            foreach ($except as $pattern) {
+                if (Str::is($pattern, $table)) {
+                    $skip = true;
+                }
+            }
+            if($skip){continue;}
             $factory = new ReferenceFactory($related, $this);
             $references = $factory->make();
             foreach ($references as $reference) {
