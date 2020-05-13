@@ -327,6 +327,9 @@ class Factory
         if (preg_match_all($classNamespaceRegExp, $placeholder, $matches)) {
             foreach ($matches[1] as $match) {
                 $usedClassName = $match;
+                if(strpos($usedClassName, "\Illuminate\\") === false && !class_exists($usedClassName)){
+                    continue;
+                }
                 $usedInModelClasses[] = trim($usedClassName, '\\');
                 $namespaceParts = explode('\\', $usedClassName);
                 $resultClassName = array_pop($namespaceParts);
