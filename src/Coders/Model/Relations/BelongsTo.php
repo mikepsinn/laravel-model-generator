@@ -72,6 +72,16 @@ class BelongsTo implements Relation
             default:
             case 'related':
                 $relationName = $this->related->getClassName();
+                $columns = $this->command->get('columns');
+                if(count($columns) === 1){
+                    $col = $columns[0];
+                    if(stripos($col, '_id') !== false){
+                        $col = str_replace('_id', '', $col);
+                        if(strlen($col) > strlen($relationName)){
+                            $relationName = $col;
+                        }
+                    }
+                }
                 break;
         }
 
