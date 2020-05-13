@@ -86,6 +86,29 @@ abstract class HasOneOrMany implements Relation
     }
 
     /**
+     * @return array
+     */
+    public function relationshipInfo(){
+        $arr = [];
+        $related = $this->related;
+        $parent = $this->parent;
+        $arr['relationshipType'] = ucfirst($this->method());
+        $arr['qualifiedUserClassName'] = $related->getQualifiedUserClassName().'::class';
+        $constantNamePrefix = $parent->constantNamePrefix();
+        if ($this->needsForeignKey()) {
+            $arr['foreignKey'] = $parent->usesPropertyConstants()
+                ? $related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
+                : $this->foreignKey();
+        }
+        if ($this->needsLocalKey()) {
+            $arr['localKey'] = $related->usesPropertyConstants()
+                ? $related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->localKey())
+                : $this->localKey();
+        }
+        return $arr;
+    }
+
+    /**
      * @return string
      */
     abstract protected function method();

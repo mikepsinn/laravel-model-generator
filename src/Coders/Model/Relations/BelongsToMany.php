@@ -139,6 +139,38 @@ class BelongsToMany implements Relation
     }
 
     /**
+     * @return array
+     */
+    public function relationshipInfo(){
+        $arr = [];
+
+
+        $arr['relationshipType'] = "BelongsToMany";
+        $arr['qualifiedUserClassName'] = $this->reference->getQualifiedUserClassName().'::class';
+
+        $constantNamePrefix = $this->parent->constantNamePrefix();
+
+        if ($this->needsPivotTable()) {
+            $arr['pivotTable'] = $this->pivotTable();
+        }
+
+        if ($this->needsForeignKey()) {
+            $arr['foreignKey'] = $foreignKey = $this->parent->usesPropertyConstants()
+                ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
+                : $this->foreignKey();
+        }
+
+        if ($this->needsOtherKey()) {
+            $arr['otherKey'] = $otherKey = $this->reference->usesPropertyConstants()
+                ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->otherKey())
+                : $this->otherKey();
+        }
+
+        $arr['PivotFields'] = $fields = $this->getPivotFields();
+        return $arr;
+    }
+
+    /**
      * @return bool
      */
     protected function needsPivotTable()

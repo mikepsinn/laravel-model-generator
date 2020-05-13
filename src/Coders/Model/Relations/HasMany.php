@@ -50,6 +50,19 @@ class HasMany extends HasOneOrMany
             case 'related':
             default:
                 $relationName = $relationBaseName;
+                $columns = $this->command->get('columns');
+                if(count($columns) === 1){
+                    $col = $columns[0];
+                    if(stripos($col, '_id') !== false){
+                        $parentTable = $this->parent->getTable(true);
+                        $parentSingular = Str::singular($parentTable);
+                        $parentSingularIdField = $parentSingular."_id";
+                        $col = str_replace('_id', '', $col);
+                        if(strlen($col) > strlen($parentSingularIdField)){
+                            $relationName = $relationBaseName."_where_".$col;
+                        }
+                    }
+                }
                 break;
         }
 

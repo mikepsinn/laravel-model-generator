@@ -23,4 +23,9 @@ interface Relation
      * @return string
      */
     public function body();
+
+    /**
+     * @return array
+     */
+    public function relationshipInfo();
 }

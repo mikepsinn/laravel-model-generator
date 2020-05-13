@@ -420,8 +420,8 @@ class Factory
 
         // When table is not plural, append the table name
         if ($model->needsTableName()) {
-            $body .= $this->class->field('table', $model->getTableForQuery());
             $body .= $this->class->constant('TABLE', $model->getTableForQuery());
+            $body .= $this->class->field('table', "self::TABLE");
         }
 
         $body .= $this->class->constant('CLASS_DESCRIPTION', $model->getBlueprint()->comment);
@@ -478,7 +478,16 @@ class Factory
             $body .= $this->class->method($mutation->name(), $mutation->body(), ['before' => "\n"]);
         }
 
-        foreach ($model->getRelations() as $constraint) {
+        $relations = $model->getRelations();
+        foreach ($relations as $constraint) {
+            $one = $constraint->relationshipInfo();
+            $one['methodName'] = $constraint->name();
+            $relationsArray[$constraint->name()] = $one;
+        }
+
+        $body .= $this->class->field('relationshipInfo', $relationsArray, ['before' => "\n"]);
+
+        foreach ($relations as $constraint) {
             $body .= $this->class->method($constraint->name(), $constraint->body(), ['before' => "\n"]);
         }
 

@@ -60,4 +60,12 @@ class HasOneOrManyStrategy implements Relation
     {
         return $this->relation->body();
     }
+
+    /**
+     * @return array
+     */
+    public function relationshipInfo()
+    {
+        return $this->relation->relationshipInfo();
+    }
 }

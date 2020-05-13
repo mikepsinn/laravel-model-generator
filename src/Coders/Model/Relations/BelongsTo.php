@@ -150,6 +150,50 @@ class BelongsTo implements Relation
     }
 
     /**
+     * @return array
+     */
+    public function relationshipInfo(){
+        $arr = [];
+        $related = $this->related;
+        $parent = $this->parent;
+
+        $arr['relationshipType'] = "BelongsTo";
+        $arr['qualifiedUserClassName'] = $related->getQualifiedUserClassName().'::class';
+
+        $constantNamePrefix = $parent->constantNamePrefix();
+
+        $arr['foreignKeyColumnName'] = $foreignKeyColumnName = $this->foreignKey();
+        $arr['foreignKey'] = $foreignKey = $parent->usesPropertyConstants()
+            ? $parent->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($foreignKeyColumnName)
+            : $foreignKeyColumnName;
+
+        $arr['otherKeyColumnName'] = $otherKeyColumnName = $this->otherKey();
+        $arr['otherKey'] = $otherKey = $related->usesPropertyConstants()
+            ? $related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($otherKeyColumnName)
+            : $otherKeyColumnName;
+
+        $arr['ownerKeyColumnName'] = $ownerKeyColumnName = $this->ownerKey();
+        $arr['ownerKey'] = $ownerKey = $parent->usesPropertyConstants()
+            ? $parent->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($ownerKeyColumnName)
+            : $foreignKeyColumnName;
+
+        if ($this->hasCompositeOtherKey()) {
+            // We will assume that when this happens the referenced columns are a composite primary key
+            // or a composite unique key. Otherwise it should be a has-many relationship which is not
+            // supported at the moment. @todo: Improve relationship resolution.
+            foreach ($this->command->references as $index => $column) {
+                foreach ($this->command->references as $index => $column) {
+                    $arr['CompositeOtherKeys'][] = [
+                        'qualifiedOtherKey' => $this->qualifiedOtherKey($index),
+                        'qualifiedForeignKey' => $this->qualifiedForeignKey($index),
+                    ];
+                }
+            }
+        }
+        return $arr;
+    }
+
+    /**
      * @return string
      */
     public function hint()
