@@ -336,7 +336,7 @@ class Model
 
         // Track comment hints
         if (! empty($column->comment)) {
-            $this->hints[$column->name] = $column->comment;
+            $this->hints[$column->name] = str_replace('\'', '\\\'', $column->comment);
         }
 
         // Track PHP type hints

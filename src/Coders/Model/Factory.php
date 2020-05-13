@@ -479,6 +479,7 @@ class Factory
         }
 
         $relations = $model->getRelations();
+        $relationsArray = [];
         foreach ($relations as $constraint) {
             $one = $constraint->relationshipInfo();
             $one['methodName'] = $constraint->name();
