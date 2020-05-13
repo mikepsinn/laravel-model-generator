@@ -424,6 +424,8 @@ class Factory
             $body .= $this->class->constant('TABLE', $model->getTableForQuery());
         }
 
+        $body .= $this->class->constant('CLASS_DESCRIPTION', $model->getBlueprint()->comment);
+
         if ($model->hasCustomPrimaryKey()) {
             $body .= $this->class->field('primaryKey', $model->getPrimaryKey());
         }

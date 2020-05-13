@@ -57,6 +57,11 @@ class Blueprint
     protected $isView;
 
     /**
+     * @var string
+     */
+    public $comment;
+
+    /**
      * Blueprint constructor.
      *
      * @param string $connection

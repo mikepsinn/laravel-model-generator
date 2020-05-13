@@ -34,6 +34,11 @@ class Schema implements \Reliese\Meta\Schema
     protected $tables = [];
 
     /**
+     * @var string
+     */
+    public $comment;
+
+    /**
      * Mapper constructor.
      *
      * @param string $schema
@@ -356,6 +361,12 @@ class Schema implements \Reliese\Meta\Schema
     protected function loadTable($table, $isView = false)
     {
         $blueprint = new Blueprint($this->connection->getName(), $this->schema, $table, $isView);
+        $info = $this->connection->select("SELECT * 
+                FROM INFORMATION_SCHEMA.TABLES 
+                WHERE table_schema='$this->schema'
+                    AND table_name='$table'; ");
+        $info = $info[0];
+        $blueprint->comment = $this->comment = $info->TABLE_COMMENT;
         $this->fillColumns($blueprint);
         $this->fillConstraints($blueprint);
         $this->tables[$table] = $blueprint;
