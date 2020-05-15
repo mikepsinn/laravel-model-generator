@@ -107,19 +107,15 @@ class BelongsToMany implements Relation
             $body .= ', '.Dumper::export($this->pivotTable());
         }
 
-        if ($this->needsForeignKey()) {
-            $foreignKey = $this->parent->usesPropertyConstants()
-                ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
-                : $this->foreignKey();
-            $body .= ', '.Dumper::export($foreignKey);
-        }
+        $foreignKey = $this->parent->usesPropertyConstants()
+            ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
+            : $this->foreignKey();
+        $body .= ', '.Dumper::export($foreignKey);
 
-        if ($this->needsOtherKey()) {
-            $otherKey = $this->reference->usesPropertyConstants()
-                ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->otherKey())
-                : $this->otherKey();
-            $body .= ', '.Dumper::export($otherKey);
-        }
+        $otherKey = $this->reference->usesPropertyConstants()
+            ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->otherKey())
+            : $this->otherKey();
+        $body .= ', '.Dumper::export($otherKey);
 
         $body .= ')';
 
@@ -144,7 +140,6 @@ class BelongsToMany implements Relation
     public function relationshipInfo(){
         $arr = [];
 
-
         $arr['relationshipType'] = "BelongsToMany";
         $arr['qualifiedUserClassName'] = $this->reference->getQualifiedUserClassName().'::class';
 
@@ -154,17 +149,15 @@ class BelongsToMany implements Relation
             $arr['pivotTable'] = $this->pivotTable();
         }
 
-        if ($this->needsForeignKey()) {
-            $arr['foreignKey'] = $foreignKey = $this->parent->usesPropertyConstants()
-                ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
-                : $this->foreignKey();
-        }
+        $arr['foreignKey'] = $foreignKey = $this->parent->usesPropertyConstants()
+            ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
+            : $this->foreignKey();
 
-        if ($this->needsOtherKey()) {
-            $arr['otherKey'] = $otherKey = $this->reference->usesPropertyConstants()
-                ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->otherKey())
-                : $this->otherKey();
-        }
+
+        $arr['otherKey'] = $otherKey = $this->reference->usesPropertyConstants()
+            ? $this->reference->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->otherKey())
+            : $this->otherKey();
+
 
         $arr['PivotFields'] = $fields = $this->getPivotFields();
         return $arr;

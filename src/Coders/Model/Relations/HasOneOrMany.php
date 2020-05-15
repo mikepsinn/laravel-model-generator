@@ -66,19 +66,15 @@ abstract class HasOneOrMany implements Relation
 
         $constantNamePrefix = $this->parent->constantNamePrefix();
 
-        if ($this->needsForeignKey()) {
-            $foreignKey = $this->parent->usesPropertyConstants()
-                ? $this->related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
-                : $this->foreignKey();
-            $body .= ', '.Dumper::export($foreignKey);
-        }
+        $foreignKey = $this->parent->usesPropertyConstants()
+            ? $this->related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
+            : $this->foreignKey();
+        $body .= ', '.Dumper::export($foreignKey);
 
-        if ($this->needsLocalKey()) {
-            $localKey = $this->related->usesPropertyConstants()
-                ? $this->related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->localKey())
-                : $this->localKey();
-            $body .= ', '.Dumper::export($localKey);
-        }
+        $localKey = $this->related->usesPropertyConstants()
+            ? $this->related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->localKey())
+            : $this->localKey();
+        $body .= ', '.Dumper::export($localKey);
 
         $body .= ');';
 
@@ -95,16 +91,12 @@ abstract class HasOneOrMany implements Relation
         $arr['relationshipType'] = ucfirst($this->method());
         $arr['qualifiedUserClassName'] = $related->getQualifiedUserClassName().'::class';
         $constantNamePrefix = $parent->constantNamePrefix();
-        if ($this->needsForeignKey()) {
-            $arr['foreignKey'] = $parent->usesPropertyConstants()
-                ? $related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
-                : $this->foreignKey();
-        }
-        if ($this->needsLocalKey()) {
-            $arr['localKey'] = $related->usesPropertyConstants()
-                ? $related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->localKey())
-                : $this->localKey();
-        }
+        $arr['foreignKey'] = $parent->usesPropertyConstants()
+            ? $related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->foreignKey())
+            : $this->foreignKey();
+        $arr['localKey'] = $related->usesPropertyConstants()
+            ? $related->getQualifiedUserClassName().'::'.$constantNamePrefix.strtoupper($this->localKey())
+            : $this->localKey();
         return $arr;
     }
 
