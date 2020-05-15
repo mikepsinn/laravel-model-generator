@@ -241,7 +241,6 @@ class Model
             $this->rules[$propertyName] = $ruleString;
         }
 
-
         if (! $this->loadRelations) {
             return;
         }
@@ -307,21 +306,17 @@ class Model
         if ($column->name == $this->getDeletedAtField()) {
             $cast = 'string';
         }
-
-        // Track dates
-        if ($cast == 'date') {
-            $this->dates[] = $propertyName;
-        }
-        // Track attribute casts
-        elseif ($cast != 'string') {
-            $this->casts[$propertyName] = $cast;
-        }
-
-        foreach ($this->config('casts', []) as $pattern => $casting) {
+        $castingsFromConfigFile = $this->config('casts', []) ;
+        foreach ($castingsFromConfigFile as $pattern => $casting) {
             if (Str::is($pattern, $column->name)) {
-                $this->casts[$propertyName] = $cast = $casting;
+                $cast = $casting;
                 break;
             }
+        }
+        if ($cast == 'date') {
+            $this->dates[] = $propertyName;
+        } else {
+            $this->casts[$propertyName] = $cast;
         }
 
         if ($this->isHidden($column->name)) {
