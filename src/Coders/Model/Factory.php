@@ -454,26 +454,38 @@ class Factory
         }
 
         if ($model->hasCasts()) {
-            $body .= $this->class->field('casts', $model->getCasts(), ['before' => "\n"]);
+            $casts = $model->getCasts();
+            ksort($casts);
+            $body .= $this->class->field('casts', $casts, ['before' => "\n"]);
         }
 
         if ($model->hasRules()) {
-            $body .= $this->class->field('rules', $model->getRules(), ['before' => "\n"]);
+            $rules = $model->getRules();
+            ksort($rules);
+            $body .= $this->class->field('rules', $rules, ['before' => "\n"]);
         }
 
         if ($model->hasDates()) {
-            $body .= $this->class->field('dates', $model->getDates(), ['before' => "\n"]);
+            $dates = $model->getDates();
+            ksort($dates);
+            $body .= $this->class->field('dates', $dates, ['before' => "\n"]);
         }
 
         if ($model->hasHidden() && $model->doesNotUseBaseFiles()) {
+            $hidden = $model->getHidden();
+            ksort($hidden);
             $body .= $this->class->field('hidden', $model->getHidden(), ['before' => "\n"]);
         }
 
         if ($model->hasFillable() && $model->doesNotUseBaseFiles()) {
+            $fillable = $model->getFillable();
+            ksort($fillable);
             $body .= $this->class->field('fillable', $model->getFillable(), ['before' => "\n"]);
         }
 
         if ($model->hasHints() && $model->usesHints()) {
+            $hints = $model->getHints();
+            ksort($hints);
             $body .= $this->class->field('hints', $model->getHints(), ['before' => "\n"]);
         }
 
@@ -482,14 +494,14 @@ class Factory
         }
 
         $relations = $model->getRelations();
-        $relationsArray = [];
+        $relationshipInfo = [];
         foreach ($relations as $constraint) {
             $one = $constraint->relationshipInfo();
             $one['methodName'] = $constraint->name();
-            $relationsArray[$constraint->name()] = $one;
+            $relationshipInfo[$constraint->name()] = $one;
         }
 
-        $body .= $this->class->field('relationshipInfo', $relationsArray, ['before' => "\n"]);
+        $body .= $this->class->field('relationshipInfo', $relationshipInfo, ['before' => "\n"]);
 
         foreach ($relations as $constraint) {
             $body .= $this->class->method($constraint->name(), $constraint->body(), ['before' => "\n"]);
@@ -613,10 +625,14 @@ class Factory
         $body = '';
 
         if ($model->hasHidden()) {
+            $hidden = $model->getHidden();
+            ksort($hidden);
             $body .= $this->class->field('hidden', $model->getHidden());
         }
 
         if ($model->hasFillable()) {
+            $fillable = $model->getFillable();
+            ksort($fillable);
             $body .= $this->class->field('fillable', $model->getFillable(), ['before' => "\n"]);
         }
 
