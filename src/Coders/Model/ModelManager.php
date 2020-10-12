@@ -69,4 +69,16 @@ class ModelManager implements IteratorAggregate
     {
         return new ArrayIterator($this->models);
     }
+
+    public function getDB(): \Illuminate\Database\DatabaseManager {
+        return $this->getFactory()->getDB();
+    }
+
+    public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager {
+        return $this->getDB()->getDoctrineSchemaManager();
+    }
+
+    public function getFactory(): \Reliese\Coders\Model\Factory {
+        return $this->factory;
+    }
 }

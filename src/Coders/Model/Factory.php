@@ -657,4 +657,8 @@ class Factory
 
         return $this->config->get($blueprint, $key, $default);
     }
+    
+    public function getDB(): \Illuminate\Database\DatabaseManager {
+        return $this->db;
+    }
 }

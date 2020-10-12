@@ -2,6 +2,7 @@
 
 namespace Reliese\Coders\Model\Rules;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use InvalidArgumentException;
 // use Illuminate\Console\DetectsApplicationNamespace;
 
@@ -10,7 +11,7 @@ class Generator
     // use DetectsApplicationNamespace;
 
     protected $combine;
-    protected $schema;
+    public $schema;
 
     public function __construct($schemaManager = null)
     {
@@ -50,7 +51,9 @@ class Generator
         return new static();
     }
 
-
+    public function setSchema(AbstractSchemaManager $schemaManager){
+        $this->schema = new Schema($schemaManager);
+    }
 
     /**
      * Return the DB-specific rules from all tables in the database
@@ -109,9 +112,13 @@ class Generator
      */
     public function getTableRules($table, $rules = null)
     {
-        $tableRules = $this->getTableRuleArray($table);
-
-        return $this->combine->tables($rules, $tableRules);
+        try {
+            $tableRules = $this->getTableRuleArray($table);
+            return $this->combine->tables($rules, $tableRules);
+        } catch (\Throwable $e){
+            $tableRules = $this->getTableRuleArray($table);
+            return $this->combine->tables($rules, $tableRules);
+        }
     }
 
     /**
@@ -192,6 +199,10 @@ class Generator
 
         $rules = [];
         $columns = $this->schema->columns($table);
+        
+        if(!$columns){
+            $columns = $this->schema->columns($table);
+        }
 
         foreach($columns as $column) {
             $colName = $column->getName();

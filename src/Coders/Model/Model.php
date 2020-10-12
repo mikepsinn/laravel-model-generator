@@ -230,15 +230,21 @@ class Model
             $this->parseColumn($column);
         }
 
-        \Illuminate\Support\Facades\DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()
-            ->registerDoctrineTypeMapping('enum', 'string');
-        $rules = \Reliese\Coders\Model\Rules\Generator::make()->getTableRules($this->getTable());
-        foreach($rules as $propertyName => $ruleString){
-            if($this->usesPropertyConstants()){
-                $prefix = $this->constantNamePrefix();
-                $propertyName = 'self::'.$prefix.strtoupper($propertyName);
+        try {
+            $schemaManager = $this->getSchemaManager();
+            $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+            $ruleGenerator = \Reliese\Coders\Model\Rules\Generator::make();
+            $ruleGenerator->setSchema($schemaManager);
+            $rules = $ruleGenerator->getTableRules($this->getTable());
+            foreach($rules as $propertyName => $ruleString){
+                if($this->usesPropertyConstants()){
+                    $prefix = $this->constantNamePrefix();
+                    $propertyName = 'self::'.$prefix.strtoupper($propertyName);
+                }
+                $this->rules[$propertyName] = $ruleString;
             }
-            $this->rules[$propertyName] = $ruleString;
+        } catch (\Throwable $e){
+            \Log::error($e->getMessage());
         }
 
         if (! $this->loadRelations) {
@@ -1290,5 +1296,17 @@ class Model
     public function config($key = null, $default = null)
     {
         return $this->factory->config($this->getBlueprint(), $key, $default);
+    }
+
+    public function getDB(): \Illuminate\Database\DatabaseManager {
+        return $this->getFactory()->getDB();
+    }
+
+    public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager {
+        return $this->getDB()->getDoctrineSchemaManager();
+    }
+
+    public function getFactory(): \Reliese\Coders\Model\Factory {
+        return $this->factory;
     }
 }
